@@ -103,7 +103,6 @@ df.head()
 columns_to_tokenize = ["Concept", "Property", "Related Concept"]
 
 df_tokenized, vocab = tokenize_columns(df, columns_to_tokenize)
-display(df.head())
 print("First 10 rows of Vocabulary:")
 pprint(dict(list(vocab.items())[:10]))
 
