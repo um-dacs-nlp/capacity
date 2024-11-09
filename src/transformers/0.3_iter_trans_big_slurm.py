@@ -161,11 +161,10 @@ max_seq_len = 2  # Maximum sequence length (concept + property)
 batch_size = 64
 lr = 0.001
 # data params
-n_values = [10, 100, 1000, 10000, 50000, 100000]
+n_values = [50000, 60000, 70000, 80000, 90000, 100000]
 # n_values = [10, 100, 1000]
 # epochs
-epochs = 100
-
+epochs = 500
 
 results = defaultdict(list)
 final_models = {}
@@ -260,6 +259,14 @@ for n in n_values:
         final_models[(n, iteration)] = model    
         # Save all accuracies for the current n value
         results[n].append(results_for_n)
+    # Add timestamp to filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Pickle the results and final models dictionaries
+    with open(f"../../../data/out_metrics/results_{timestamp}_50_100k_trans.pkl", "wb") as f:
+        pickle.dump(results, f)
+    with open(f"../../../data/out_models/models_{timestamp}_50_100k_trans.pkl", "wb") as f:
+        pickle.dump(final_models, f)
+    print(f'Finished for {n}, timestamp: {timestamp}')
 
 
 # In[ ]:
