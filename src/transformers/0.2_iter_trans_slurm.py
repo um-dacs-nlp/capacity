@@ -7,16 +7,16 @@
 import pickle
 import random
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from collections import defaultdict
 from datetime import datetime
 from pprint import pprint
 from tqdm import tqdm
 
 import torch
+import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 
 DATA = "/home/achangalidi/project/data/triplets.tsv"
@@ -110,11 +110,6 @@ pprint(dict(list(vocab.items())[:10]))
 # ## The Model
 
 # In[6]:
-
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
 
 
 class GPTLikeModel(nn.Module):
@@ -264,8 +259,8 @@ for n in n_values:
         # Save the final model for this iteration
         final_models[(n, iteration)] = model
     
-    # Save all accuracies for the current n value
-    results[n].append(results_for_n)
+        # Save all accuracies for the current n value
+        results[n].append(results_for_n)
 
 
 # In[ ]:
@@ -279,9 +274,6 @@ with open(f"../../../data/out_metrics/results_{timestamp}_init_trans.pkl", "wb")
     pickle.dump(results, f)
 with open(f"../../../data/out_models/models_{timestamp}_init_trans.pkl", "wb") as f:
     pickle.dump(final_models, f)
-
-
-# In[ ]:
 
 
 
