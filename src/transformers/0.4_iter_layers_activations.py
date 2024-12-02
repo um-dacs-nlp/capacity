@@ -216,7 +216,7 @@ n_heads = 4  # Number of attention heads
 max_seq_len = 2  # Maximum sequence length (concept + property)
 batch_size = 128
 lr = 0.001
-epochs = 5
+epochs = 500
 
 # Calculate the number of parameters to keep the total number constant
 base_num_layers = 1
@@ -248,7 +248,7 @@ start_index, end_index = args.start_index, args.end_index
 
 results = defaultdict(list)
 final_models = {}
-num_iterations = 1
+num_iterations = 10
 
 # Iterate through configurations starting from the specified index
 for config_index in range(start_index, min(end_index, len(configurations))):
@@ -279,9 +279,9 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         )
 
         # Move the model to GPU if available
-        device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-
+        print(device)
         # Define the optimizer and loss function
         optimizer = optim.Adam(model.parameters(), lr=lr)
         criterion = nn.CrossEntropyLoss()
