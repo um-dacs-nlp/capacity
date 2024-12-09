@@ -241,9 +241,11 @@ print(len(configurations))
 parser = argparse.ArgumentParser(description='Experiment Configuration')
 parser.add_argument('--start_index', type=int, default=0, help='Start index for configurations')
 parser.add_argument('--end_index', type=int, default=len(configurations), help='End index for configurations')
+parser.add_argument('--cuda_index', type=int, default=3, help='Cuda index')
 args = parser.parse_args()
 
 start_index, end_index = args.start_index, args.end_index
+cuda_index = args.cuda_index
 
 
 results = defaultdict(list)
@@ -279,7 +281,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         )
 
         # Move the model to GPU if available
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        device = torch.device(f"cuda:{cuda_index}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
         print(device)
         # Define the optimizer and loss function
