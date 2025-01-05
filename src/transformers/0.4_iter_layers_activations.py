@@ -205,7 +205,7 @@ df_tokenized, vocab = tokenize_columns(df, columns_to_tokenize)
 
 
 # Experiment parameters
-n_values = [50000, 100000]
+n_values = [50000, 70000, 100000]
 activation_functions = ["default", "GELU", "RAF", "softmax"]
 n_layers_values = [1, 2, 4]
 
@@ -216,7 +216,7 @@ n_heads = 4  # Number of attention heads
 max_seq_len = 2  # Maximum sequence length (concept + property)
 batch_size = 128
 lr = 0.001
-epochs = 500
+epochs = 1000
 
 # Calculate the number of parameters to keep the total number constant
 base_num_layers = 1
