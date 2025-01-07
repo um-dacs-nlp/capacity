@@ -26,7 +26,7 @@ import random
 
 DB_NAME = "../../../data/pym.sqlite3"
 ZIP_NAME = "../../../data/umls-2024AA-full.zip"
-SAVE_TO = "../../../data/created_data/seqs{}.tsv"
+SAVE_TO = "../../../data/created_data/seqs_dense{}.tsv"
 MID_SAVE_TO = "../../../data/created_data/mid.tsv"
 
 
@@ -99,7 +99,6 @@ G = build_graph(ontology)
 
 # In[119]:
 
-
 # Function to beautify nodes
 def beautify_node(node_str):
     patterns = [r'SNOMEDCT_US\[".*?"\] #\s*', r'ICD10\[".*?"\] #\s*']
@@ -109,16 +108,23 @@ def beautify_node(node_str):
     return cleaned_node.strip()
 
 
-def beautify_graph_nodes(graph):
-    """Pre-beautify all nodes in the graph."""
-    mapping = {node: beautify_node(str(node)) for node in graph.nodes}
-    return nx.relabel_nodes(graph, mapping)
+
+# Function to format and save a sequence
+def save_sequence(sequence, file):
+    file.write("\t".join(sequence) + "\n")
+
 
 # Create a subgraph around a random starting node
 def create_subgraph(G, start_node, hops=3):
     bfs_nodes = nx.single_source_shortest_path_length(G, start_node, cutoff=hops)
     subgraph_nodes = list(bfs_nodes.keys())
     return G.subgraph(subgraph_nodes)
+
+def beautify_graph_nodes(graph):
+    """Pre-beautify all nodes in the graph."""
+    mapping = {node: beautify_node(str(node)) for node in graph.nodes}
+    return nx.relabel_nodes(graph, mapping)
+
 
 # Generate a sequence from the subgraph with global ambiguity avoidance
 def generate_sequence_from_subgraph(subgraph, edge_count_range=(3, 5)):
@@ -174,9 +180,71 @@ def generate_sequence_from_subgraph(subgraph, edge_count_range=(3, 5)):
     return sequence
 
 
-# Function to format and save a sequence
-def save_sequence(sequence, file):
-    file.write("\t".join(sequence) + "\n")
+
+def has_unvisited_edges(node, graph, visited_pairs):
+    """Check if a node has any unvisited edges."""
+    for neighbor in graph.neighbors(node):
+        edge_data = graph.get_edge_data(node, neighbor)
+        edge_name = edge_data.get('relationship', 'No relationship') if edge_data else 'No relationship'
+        if (node, edge_name) not in visited_pairs:
+            return True  # Found an unvisited edge
+    return False  # All edges for this node are visited
+
+# Main function to create condensed sequences
+def create_condensed_sequences(graph, save_to, num_sequences, edge_count_range=(3, 5), min_component_size=5):
+    global visited_pairs
+    visited_pairs = set()
+    cur_component_visited_nodes = set()  # Track all visited nodes within the current connectivity component
+    successful_sequences = 0  # Counter for successful sequences
+    # Precompute all original neighbors
+    original_neighbors = {node: set(graph.neighbors(node)) for node in graph.nodes}
+    components = [comp for comp in nx.connected_components(graph) if len(comp) >= min_component_size]
+    with open(save_to, "w") as f, tqdm(total=num_sequences) as pbar:
+        while successful_sequences < num_sequences:
+            # Generate nearby nodes, considering visited nodes
+            if cur_component_visited_nodes:
+                start_nodes = set()
+                for node in cur_component_visited_nodes:
+                    if has_unvisited_edges(node, graph, visited_pairs):
+                        start_nodes.add(node)  # Add the current node if it has any unvisited edges
+
+                    # Check neighbors for their edges
+                    for neighbor in graph.neighbors(node):
+                        if has_unvisited_edges(neighbor, graph, visited_pairs):
+                            start_nodes.add(neighbor)  # Add neighbor if it has any unvisited edges
+            else:
+                # Start a new component
+                cur_component_visited_nodes = set()  # Reset for a new component
+                component = random.choice(components)
+                start_nodes = list(component)
+                print('Go to the new connectivity component: previously selected `cur_component_visited_nodes` turned out to be empty.')
+                
+            if not start_nodes:
+                # Fallback to a random component if no nearby nodes
+                cur_component_visited_nodes = set()  # Reset for a new component
+                component = random.choice(components)
+                start_nodes = list(component)
+                print('Go to the new connectivity component: we took the max from previously selected `cur_component_visited_nodes`.')
+            
+             # Randomly select a starting node
+            start_node = random.choice(list(start_nodes))
+            subgraph = create_subgraph(graph, start_node, hops=edge_count_range[1])  # Create a subgraph around the node
+            # Generate sequence
+            sequence = generate_sequence_from_subgraph(subgraph, edge_count_range=edge_count_range)
+            
+            # Skip too-short sequences
+            if len(sequence) <= edge_count_range[0]:
+                continue
+
+            # Save the sequence
+            save_sequence(sequence, f)
+
+            # Update progress bar and counters
+            successful_sequences += 1
+            pbar.update(1)
+
+            # Update last sequence nodes
+            cur_component_visited_nodes = cur_component_visited_nodes | set(sequence[::2])  # Add all visited nodes
 
 
 # In[117]:
@@ -184,17 +252,7 @@ def save_sequence(sequence, file):
 ROWS=10000
 
 
-# Global set to track visited node+edge pairs across all sequences
+# Example Usage
 visited_pairs = set()
-
-graph = beautify_graph_nodes(G.copy())
-
-# Open the file once, clear its content initially, and write all sequences
-with open(SAVE_TO.format(ROWS), "w") as f:  # Open in write mode to clear and write
-    for i in tqdm(range(ROWS)):
-        start_node = random.choice(list(graph.nodes))  # Random starting node
-        subgraph = create_subgraph(graph, start_node, hops=5)  # Create a subgraph around the node
-        sequence = generate_sequence_from_subgraph(subgraph, edge_count_range=(3, 5))  # Generate sequence
-
-        # Save the sequence to the file
-        save_sequence(sequence, f)
+graph = beautify_graph_nodes(G.copy())  # Work with a copy of the graph to avoid modifying the original   
+create_condensed_sequences(graph, SAVE_TO.format(ROWS), num_sequences=ROWS, edge_count_range=(3, 5), min_component_size=5)
