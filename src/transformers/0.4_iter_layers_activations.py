@@ -34,6 +34,9 @@ SEED = 566
 RESULTS_FILE = (
     "../../../data/out_metrics/results_{timestamp}_lay_act_{config_index}.pkl"
 )
+LOSSES_FILE = (
+    "../../../data/out_metrics/losses_{timestamp}_lay_act_{config_index}.pkl"
+)
 MODELS_FILE = "../../../data/out_models/models_{timestamp}_lay_act_{config_index}.pkl"
 
 
@@ -249,6 +252,7 @@ cuda_index = args.cuda_index
 
 
 results = defaultdict(list)
+losses = defaultdict(list)
 final_models = {}
 num_iterations = 10
 
@@ -260,6 +264,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
 
     for iteration in range(num_iterations):
         results_for_n = []  # Create a separate list for each n value
+        losses_for_n = []
         print(
             f"Training with n={n}, activation={activation_fn_name}, layers={n_layers}, iteration={iteration + 1}"
         )
@@ -320,6 +325,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
                 total_loss += loss.item()
 
             print(f"Epoch {epoch + 1}, Training Loss: {total_loss / len(train_loader)}")
+            losses_for_n.append(total_loss / len(train_loader))
             if epoch % 2 == 0:
                 continue  # skip 0,2,4... (e.g. if n_iters=100, so we plot 1,3,..99 (99th is the last))
             # Testing on the same data (memorization check)
@@ -347,6 +353,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         final_models[(n, activation_fn_name, n_layers, iteration)] = model
         # Save all accuracies for the current n value
         results[(n, activation_fn_name, n_layers)].append(results_for_n)
+        losses[(n, activation_fn_name, n_layers)].append(losses_for_n)
 
     # Add timestamp to filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -355,6 +362,10 @@ for config_index in range(start_index, min(end_index, len(configurations))):
     save_results(
         results,
         RESULTS_FILE.format(**{"timestamp": timestamp, "config_index": indexes}),
+    )
+    save_results(
+        losses,
+        LOSSES_FILE.format(**{"timestamp": timestamp, "config_index": indexes}),
     )
     save_results(
         final_models,
