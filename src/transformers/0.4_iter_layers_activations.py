@@ -324,7 +324,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
 
                 total_loss += loss.item()
 
-            print(f"Epoch {epoch + 1}, Training Loss: {total_loss / len(train_loader)}")
+            print(f"Epoch {epoch + 1}/{epochs} (iteration {iteration + 1}/{num_iterations}), Training Loss: {total_loss / len(train_loader)}")
             losses_for_n.append(total_loss / len(train_loader))
             if epoch % 2 == 0:
                 continue  # skip 0,2,4... (e.g. if n_iters=100, so we plot 1,3,..99 (99th is the last))

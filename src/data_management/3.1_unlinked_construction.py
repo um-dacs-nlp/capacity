@@ -181,7 +181,8 @@ def save_sequence(sequence, file):
 
 # In[117]:
 
-ROWS=10000
+ROWS=100000
+
 
 
 # Global set to track visited node+edge pairs across all sequences
