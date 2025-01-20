@@ -358,6 +358,19 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         results[(n, activation_fn_name, n_layers)].append(results_for_n)
         losses[(n, activation_fn_name, n_layers)].append(losses_for_n)
 
+        # Intermediate save
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        indexes = f"{start_index}_{end_index}_{iteration}"
+        # Pickle the results and final models dictionaries
+        save_results(
+            results,
+            RESULTS_FILE.format(**{"timestamp": timestamp, "config_index": indexes}),
+        )
+        save_results(
+            losses,
+            LOSSES_FILE.format(**{"timestamp": timestamp, "config_index": indexes}),
+        )
+
     # Add timestamp to filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     indexes = f"{start_index}_{end_index}"
@@ -377,6 +390,3 @@ for config_index in range(start_index, min(end_index, len(configurations))):
 
 
 # In[ ]:
-
-
-
