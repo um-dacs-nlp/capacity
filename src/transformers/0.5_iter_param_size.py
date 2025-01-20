@@ -268,7 +268,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         results_for_n = []  # Create a separate list for each n value
         losses_for_n = []
         print(
-            f"Training with n={n}, activation={activation_fn_name}, layers={n_layers}, iteration={iteration + 1}"
+            f"Training with n={n}, activation={activation_fn_name}, layers={n_layers}, d_model={d_model} iteration={iteration + 1}"
         )
         iteration_seed = SEED + iteration
 
@@ -355,10 +355,10 @@ for config_index in range(start_index, min(end_index, len(configurations))):
             print(f"Epoch {epoch + 1}, Memorization Accuracy: {accuracy:.5f}%")
             results_for_n.append(accuracy)
         # Save the final model for this iteration
-        final_models[(n, activation_fn_name, n_layers, iteration)] = model
+        final_models[(n, activation_fn_name, n_layers, d_model, iteration)] = model
         # Save all accuracies for the current n value
-        results[(n, activation_fn_name, n_layers)].append(results_for_n)
-        losses[(n, activation_fn_name, n_layers)].append(losses_for_n)
+        results[(n, activation_fn_name, n_layers, d_model)].append(results_for_n)
+        losses[(n, activation_fn_name, n_layers, d_model)].append(losses_for_n)
 
         # Intermediate save
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
