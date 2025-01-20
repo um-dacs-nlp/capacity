@@ -244,7 +244,7 @@ print(len(configurations))
 parser = argparse.ArgumentParser(description='Experiment Configuration')
 parser.add_argument('--start_index', type=int, default=0, help='Start index for configurations')
 parser.add_argument('--end_index', type=int, default=len(configurations), help='End index for configurations')
-parser.add_argument('--cuda_index', type=int, default=3, help='Cuda index')
+parser.add_argument('--cuda_index', type=int, default=-1, help='Cuda index (negative value means without index).')
 args = parser.parse_args()
 
 start_index, end_index = args.start_index, args.end_index
@@ -286,9 +286,12 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         )
 
         # Move the model to GPU if available
-        device = torch.device(f"cuda:{cuda_index}" if torch.cuda.is_available() else "cpu")
+        if cuda_index>=0:
+            device = torch.device(f"cuda:{cuda_index}" if torch.cuda.is_available() else "cpu")
+        else:
+            device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-        print(device)
+        print(f"Device using: {device}")
         # Define the optimizer and loss function
         optimizer = optim.Adam(model.parameters(), lr=lr)
         criterion = nn.CrossEntropyLoss()
