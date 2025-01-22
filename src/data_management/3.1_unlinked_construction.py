@@ -73,7 +73,7 @@ PYM = get_ontology("http://PYM/").load()
 
 # Graph initialization from SNOMED data
 def build_graph(ontology):
-    G = nx.Graph()
+    G = nx.DiGraph()
     for concept in tqdm(ontology.classes()):
         for prop in concept.get_class_properties():
             if prop.name in BANNED_PROPS or prop.name in BANNED_GROUP:
