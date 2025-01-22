@@ -380,11 +380,6 @@ def train_model(model,
     return losses_for_n, accucaries_for_n, capacities_for_n
 
 
-# In[61]:
-
-
-df_node_edge
-
 
 # In[42]:
 
@@ -490,6 +485,10 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         else:
             device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
         
+        # Let's create sequences from df_node_edge, etc.
+        sequences = data.sample(n=n, random_state=iteration_seed).to_numpy()
+        node_masks = get_node_masks(sequences)
+        
         # Prepare dataset and data loader
         dataset = NodeEdgeSequenceDataset(sequences, node_masks, pad_token=pad_token)
         data_loader = DataLoader(
@@ -498,9 +497,6 @@ for config_index in range(start_index, min(end_index, len(configurations))):
             shuffle=True,
             collate_fn=lambda b: collate_fn(b, pad_token=pad_token)
         )        
-        # Let's create sequences from df_node_edge, etc.
-        sequences = df_node_edge.sample(n=n, random_state=iteration_seed).to_numpy()
-        node_masks = get_node_masks(sequences)
         # Build model
         model = GPTLikeModel(
             vocab_size=vocab_size,
