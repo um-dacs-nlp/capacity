@@ -301,7 +301,7 @@ def train_one_epoch(model,
     correct = 0
     total_node_positions = 0
 
-    for (batch_seqs, batch_node_masks) in tqdm(data_loader, leave=False):
+    for (batch_seqs, batch_node_masks) in tqdm(data_loader):
         # batch_seqs, batch_node_masks: [batch_size, seq_len]
         batch_seqs = batch_seqs.to(device)
         batch_node_masks = batch_node_masks.to(device)
@@ -369,15 +369,21 @@ def train_model(model,
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
     losses_for_n = []
-    accucaries_for_n = []
+    accuracies_for_n = []
     capacities_for_n = []
     for epoch in range(1, epochs + 1):
         loss, acc, capacity = train_one_epoch(model, data_loader, optimizer, device, pad_token)
         print(f"Epoch {epoch}/{epochs} | Loss: {loss:.4f} | Accuracy: {acc:.4f}% | Capacity: {capacity:.0f}/{max_to_memorize:.0f}")
         losses_for_n.append(loss)
-        accucaries_for_n.append(acc)
+        accuracies_for_n.append(acc)
         capacities_for_n.append(capacity)
-    return losses_for_n, accucaries_for_n, capacities_for_n
+    return losses_for_n, accuracies_for_n, capacities_for_n
+
+# Example function to save results
+def save_results(results, filename):
+    with open(filename, "wb") as f:
+        pickle.dump(results, f)
+    print(f"Results saved to {filename}")
 
 
 
@@ -509,7 +515,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
             seed=iteration_seed
         ).to(device)
         # Train
-        losses_for_n, accucaries_for_n, capacities_for_n = train_model(model, 
+        losses_for_n, accuracies_for_n, capacities_for_n = train_model(model, 
                                                                        data_loader, 
                                                                        epochs=epochs, 
                                                                        lr=lr, 
@@ -519,7 +525,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         # Save the final model for this iteration
         final_models[(n, activation_fn_name, n_layers, iteration)] = model
         # Save all accuracies for the current n value
-        accucaries[(n, activation_fn_name, n_layers)].append(accucaries_for_n)
+        accuracies[(n, activation_fn_name, n_layers)].append(accuracies_for_n)
         capacities[(n, activation_fn_name, n_layers)].append(capacities_for_n)
         losses[(n, activation_fn_name, n_layers)].append(losses_for_n)
         
@@ -528,7 +534,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         indexes = f"{start_index}_{end_index}_{iteration}"
         # Pickle the results and final models dictionaries
         save_results(
-            accucaries,
+            accuracies,
             ACC_FILE.format(**{"timestamp": timestamp, "config_index": indexes}),
         )
         save_results(
@@ -545,7 +551,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
     indexes = f"{start_index}_{end_index}"
     # Pickle the results and final models dictionaries
     save_results(
-        accucaries,
+        accuracies,
         ACC_FILE.format(**{"timestamp": timestamp, "config_index": indexes}),
     )
     save_results(
