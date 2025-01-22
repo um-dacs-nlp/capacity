@@ -207,20 +207,24 @@ df_tokenized, vocab = tokenize_columns(df, columns_to_tokenize)
 # In[4]:
 
 
+
+# ==========================
+# Model hyperparameters
+# ==========================
+vocab_size = len(vocab) + 1  # Include 1 for padding (if needed)
+
+batch_size = 128
+lr = 0.001
+epochs = 500
+
+# d_model = 128  # Embedding size
+n_heads = 4  # Number of attention heads
+max_seq_len = 2  # Maximum sequence length (concept + property)
 # Experiment parameters
 n_values = [1000, 10000, 50000, 100000]
 activation_functions = ["softmax", ]
 n_layers_values = [1, 2,]
 d_model_values = [16, 32, 64, 128]
-
-# Model hyperparameters
-vocab_size = len(vocab) + 1  # Include 1 for padding (if needed)
-# d_model = 128  # Embedding size
-n_heads = 4  # Number of attention heads
-max_seq_len = 2  # Maximum sequence length (concept + property)
-batch_size = 128
-lr = 0.001
-epochs = 500
 
 # Prepare the list of all possible configurations using Cartesian product
 configurations = list(
