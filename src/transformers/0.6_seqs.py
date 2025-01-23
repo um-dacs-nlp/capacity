@@ -423,11 +423,11 @@ batch_size=128
 lr=1e-3
 epochs=100
 
-d_model=128
+d_model=64
 n_heads=4
 max_seq_len=data.shape[1]-1
 
-num_iterations = 1
+num_iterations = 3
 
 # Experiment parameters
 n_values = [1000, 20000, 50000, 100000]
