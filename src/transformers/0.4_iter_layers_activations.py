@@ -156,7 +156,9 @@ class GPTLikeModel(nn.Module):
         self.transformer_layers = nn.ModuleList(
             [
                 nn.TransformerDecoderLayer(
-                    d_model=d_model, nhead=n_heads, activation=activation_fn
+                    d_model=d_model, 
+                    nhead=n_heads, 
+                    activation=activation_fn
                 )
                 for _ in range(num_layers)
             ]
