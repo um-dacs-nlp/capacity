@@ -349,7 +349,7 @@ class GPTLikeModelRot(nn.Module):
 
         # Transformer "decoder" layers, each with self-attention
         self.layers = nn.ModuleList([
-            nn.RotaryTransformerDecoderLayer(
+            RotaryTransformerDecoderLayer(
                 d_model=d_model,
                 nhead=n_heads,
                 activation=activation_fn,
@@ -639,7 +639,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         )
         if emb=='Pos':
             # Build model
-            model = GPTLikeModel(
+            model = GPTLikeModelPos(
                 vocab_size=vocab_size,
                 d_model=d_model,
                 n_heads=n_heads,
