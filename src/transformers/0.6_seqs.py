@@ -257,130 +257,130 @@ class GPTLikeModelPos(nn.Module):
         return logits
     
     
-import math
+# import math
 
 
-def rotate_half(x):
-    """Helper function to apply rotation to half of the dimensions."""
-    x1, x2 = x.chunk(2, dim=-1)
-    return torch.cat((-x2, x1), dim=-1)
+# def rotate_half(x):
+#     """Helper function to apply rotation to half of the dimensions."""
+#     x1, x2 = x.chunk(2, dim=-1)
+#     return torch.cat((-x2, x1), dim=-1)
 
 
-def apply_rotary(qk, base=10000):
-    """
-    Applies Rotary Positional Embeddings (RoPE) to queries and keys.
-    Args:
-        qk: Query or Key tensor of shape [batch_size, num_heads, seq_len, head_dim].
-        base: The base frequency for rotation.
-    Returns:
-        qk_rotary: Rotated queries or keys.
-    """
-    seq_len = qk.size(-2)
-    head_dim = qk.size(-1)
+# def apply_rotary(qk, base=10000):
+#     """
+#     Applies Rotary Positional Embeddings (RoPE) to queries and keys.
+#     Args:
+#         qk: Query or Key tensor of shape [batch_size, num_heads, seq_len, head_dim].
+#         base: The base frequency for rotation.
+#     Returns:
+#         qk_rotary: Rotated queries or keys.
+#     """
+#     seq_len = qk.size(-2)
+#     head_dim = qk.size(-1)
 
-    # Compute sinusoidal frequencies
-    theta = 1.0 / (base ** (torch.arange(0, head_dim, 2, device=qk.device) / head_dim))
-    positions = torch.arange(0, seq_len, device=qk.device).unsqueeze(1)
-    sinusoid = positions * theta
+#     # Compute sinusoidal frequencies
+#     theta = 1.0 / (base ** (torch.arange(0, head_dim, 2, device=qk.device) / head_dim))
+#     positions = torch.arange(0, seq_len, device=qk.device).unsqueeze(1)
+#     sinusoid = positions * theta
 
-    # Create sine and cosine embeddings
-    sin = sinusoid.sin().unsqueeze(0).unsqueeze(0)  # [1, 1, seq_len, head_dim//2]
-    cos = sinusoid.cos().unsqueeze(0).unsqueeze(0)  # [1, 1, seq_len, head_dim//2]
+#     # Create sine and cosine embeddings
+#     sin = sinusoid.sin().unsqueeze(0).unsqueeze(0)  # [1, 1, seq_len, head_dim//2]
+#     cos = sinusoid.cos().unsqueeze(0).unsqueeze(0)  # [1, 1, seq_len, head_dim//2]
 
-    # Apply rotation
-    qk_rotated = (qk * cos) + (rotate_half(qk) * sin)
-    return qk_rotated
-
-    
-    
-class RotaryTransformerDecoderLayer(nn.TransformerDecoderLayer):
-    def __init__(self, d_model, nhead, **kwargs):
-        super().__init__(d_model, nhead, **kwargs)
-        self.d_model = d_model
-        self.nhead = nhead
-        self.head_dim = d_model // nhead
-        assert (
-            self.head_dim * nhead == d_model
-        ), "Embedding size must be divisible by number of heads."
-
-    def forward(self, tgt, memory=None, tgt_mask=None, memory_mask=None, tgt_key_padding_mask=None, memory_key_padding_mask=None):
-        # Split into heads for Rotary embedding application
-        batch_size, seq_len, _ = tgt.size()
-        qkv_dim = self.head_dim * self.nhead
-
-        qkv = tgt.view(batch_size, seq_len, self.nhead, self.head_dim).transpose(1, 2)
-
-        # Apply Rotary Embeddings to Queries and Keys
-        qkv[:, :, :, :], qkv[:, :, :, :] = apply_rotary(qkv[:, :, :, :])
-
-        # Restore original shape after rotary embedding
-        tgt = qkv.view(batch_size, seq_len, qkv_dim)
-
-        return super().forward(
-            tgt, memory, tgt_mask, memory_mask, tgt_key_padding_mask, memory_key_padding_mask
-        )
+#     # Apply rotation
+#     qk_rotated = (qk * cos) + (rotate_half(qk) * sin)
+#     return qk_rotated
 
     
+    
+# class RotaryTransformerDecoderLayer(nn.TransformerDecoderLayer):
+#     def __init__(self, d_model, nhead, **kwargs):
+#         super().__init__(d_model, nhead, **kwargs)
+#         self.d_model = d_model
+#         self.nhead = nhead
+#         self.head_dim = d_model // nhead
+#         assert (
+#             self.head_dim * nhead == d_model
+#         ), "Embedding size must be divisible by number of heads."
 
-class GPTLikeModelRot(nn.Module):
-    def __init__(
-        self,
-        vocab_size,
-        d_model=128,
-        n_heads=4,
-        n_layers=2,
-        max_seq_len=50,
-        pad_token=0,
-        activation_fn='gelu',
-        seed=42,
-    ):
-        super().__init__()
-        torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed(seed)
-            torch.cuda.manual_seed_all(seed)
+#     def forward(self, tgt, memory=None, tgt_mask=None, memory_mask=None, tgt_key_padding_mask=None, memory_key_padding_mask=None):
+#         # Split into heads for Rotary embedding application
+#         batch_size, seq_len, _ = tgt.size()
+#         qkv_dim = self.head_dim * self.nhead
+
+#         qkv = tgt.view(batch_size, seq_len, self.nhead, self.head_dim).transpose(1, 2)
+
+#         # Apply Rotary Embeddings to Queries and Keys
+#         qkv[:, :, :, :], qkv[:, :, :, :] = apply_rotary(qkv[:, :, :, :])
+
+#         # Restore original shape after rotary embedding
+#         tgt = qkv.view(batch_size, seq_len, qkv_dim)
+
+#         return super().forward(
+#             tgt, memory, tgt_mask, memory_mask, tgt_key_padding_mask, memory_key_padding_mask
+#         )
+
+    
+
+# class GPTLikeModelRot(nn.Module):
+#     def __init__(
+#         self,
+#         vocab_size,
+#         d_model=128,
+#         n_heads=4,
+#         n_layers=2,
+#         max_seq_len=50,
+#         pad_token=0,
+#         activation_fn='gelu',
+#         seed=42,
+#     ):
+#         super().__init__()
+#         torch.manual_seed(seed)
+#         if torch.cuda.is_available():
+#             torch.cuda.manual_seed(seed)
+#             torch.cuda.manual_seed_all(seed)
             
-        self.pad_token = pad_token
-        self.d_model = d_model
-        self.max_seq_len = max_seq_len
-        print(vocab_size, d_model, pad_token)
+#         self.pad_token = pad_token
+#         self.d_model = d_model
+#         self.max_seq_len = max_seq_len
+#         print(vocab_size, d_model, pad_token)
 
-        self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_token)
+#         self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_token)
 
-        # Transformer "decoder" layers, each with self-attention
-        self.layers = nn.ModuleList([
-            RotaryTransformerDecoderLayer(
-                d_model=d_model,
-                nhead=n_heads,
-                activation=activation_fn,
-                batch_first=True
-            ) for _ in range(n_layers)
-        ])
+#         # Transformer "decoder" layers, each with self-attention
+#         self.layers = nn.ModuleList([
+#             RotaryTransformerDecoderLayer(
+#                 d_model=d_model,
+#                 nhead=n_heads,
+#                 activation=activation_fn,
+#                 batch_first=True
+#             ) for _ in range(n_layers)
+#         ])
 
-        self.fc_out = nn.Linear(d_model, vocab_size)
+#         self.fc_out = nn.Linear(d_model, vocab_size)
 
-    def forward(self, x, causal_mask=None, key_padding_mask=None):
-        """
-        x: [batch_size, seq_len]
-        causal_mask: [seq_len, seq_len] for auto-regression
-        key_padding_mask: [batch_size, seq_len], True where we want to ignore positions
-        """
-        bsz, seq_len = x.shape
-        x = self.embedding(x)
+#     def forward(self, x, causal_mask=None, key_padding_mask=None):
+#         """
+#         x: [batch_size, seq_len]
+#         causal_mask: [seq_len, seq_len] for auto-regression
+#         key_padding_mask: [batch_size, seq_len], True where we want to ignore positions
+#         """
+#         bsz, seq_len = x.shape
+#         x = self.embedding(x)
 
-        out = x
-        for layer in self.layers:
-            out = layer(
-                tgt=out,
-                memory=out,
-                tgt_mask=causal_mask,
-                memory_mask=None,
-                tgt_key_padding_mask=key_padding_mask,
-                memory_key_padding_mask=key_padding_mask
-            )
-        # project to vocab
-        logits = self.fc_out(out)  # [batch_size, seq_len, vocab_size]
-        return logits
+#         out = x
+#         for layer in self.layers:
+#             out = layer(
+#                 tgt=out,
+#                 memory=out,
+#                 tgt_mask=causal_mask,
+#                 memory_mask=None,
+#                 tgt_key_padding_mask=key_padding_mask,
+#                 memory_key_padding_mask=key_padding_mask
+#             )
+#         # project to vocab
+#         logits = self.fc_out(out)  # [batch_size, seq_len, vocab_size]
+#         return logits
     
 
 
@@ -568,7 +568,7 @@ num_iterations = 3
 n_values = [20000, 50000, 100000]
 n_layers_values = [1, 2, 4]
 activation_functions=["RReLU", "softmax"]
-emb = ['Pos', 'Rot']
+emb_values = ['Pos', ]
 
 # Calculate the number of parameters to keep the total number constant
 base_num_layers = 1
@@ -577,7 +577,7 @@ base_num_params = base_d_model * base_num_layers
 
 # Prepare the list of all possible configurations using Cartesian product
 configurations = list(
-    itertools.product(n_values, activation_functions, n_layers_values, emb)
+    itertools.product(n_values, activation_functions, n_layers_values, emb_values)
 )
 
 
@@ -650,16 +650,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
                 seed=iteration_seed
             ).to(device)
         else:
-            model = GPTLikeModelRot(
-                vocab_size=vocab_size,
-                d_model=d_model,
-                n_heads=n_heads,
-                n_layers=n_layers,
-                max_seq_len=max_seq_len,   # can exceed real max length
-                pad_token=pad_token,
-                activation_fn=activation_fn,
-                seed=iteration_seed
-            ).to(device)
+            raise ValueError
         # Train
         losses_for_n, accuracies_for_n, capacities_for_n = train_model(model, 
                                                                        data_loader, 
