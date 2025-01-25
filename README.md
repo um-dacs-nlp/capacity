@@ -9,7 +9,7 @@ The directories and their content:
         * `1_snomed_get_dataset` -- creating triplets dataframe and save.
         * `2_unlinked_construction.py` -- creating sequences dataframe and save.
     * `transformers` -- experiments with transformers models:
-        * `0.1_base_trans.ipynb`, `0.1_playground.ipynb` -- basic notebooks for tranmsformers
-        * `0.2_iter_trans.ipynb`, `0.3_iter_trans_big.ipynb` -- main training and drawing code for now (nov 13) with some results
-        * `0.2_iter_trans_slurm.py`, `0.3_iter_trans_big_slurm.py` -- corresponding files to run on slurm
-        * `1.0_extract_models.ipynb` -- extracting models and data from pickle, saving to files
+        * `1_iter_trans_big.ipynb` -- first setup of experiment with triplets;
+        * `2_layers_activations*` -- second setup of experiment with triplets (layers, activation function changing) + drawing of accuracies, capacities and losses;
+        * `3_param_size*` -- third setup of experiment with triplets (amount of parameters) + drawing of accuracies, capacities and losses;
+        * `4_seqs*` -- forth setup of experiment with sequences.
