@@ -28,7 +28,7 @@ from torch.utils.data import DataLoader, Dataset
 
 
 # constants
-DATA = "../../../data/triplets.tsv"
+DATA = "../../../data/created_data/triplets.tsv"
 SEED = 566
 # Results and models file paths
 RESULTS_FILE = (
