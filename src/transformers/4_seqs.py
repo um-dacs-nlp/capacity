@@ -532,6 +532,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
         else:
             raise ValueError
         # Train
+        print(f" Amount of parameters: {sum([p.numel() for p in model.parameters()])}")
         losses_for_n, accuracies_for_n, capacities_for_n = train_model(model, 
                                                                        data_loader, 
                                                                        epochs=epochs, 

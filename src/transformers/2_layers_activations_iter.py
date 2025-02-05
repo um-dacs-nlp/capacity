@@ -286,6 +286,7 @@ for config_index in range(start_index, min(end_index, len(configurations))):
             activation_fn,
             seed=iteration_seed,
         )
+        print(f" Amount of parameters: {sum([p.numel() for p in model.parameters()])}")
 
         # Move the model to GPU if available
         if cuda_index>=0:
