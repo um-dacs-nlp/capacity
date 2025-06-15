@@ -1,15 +1,125 @@
-# Capacity
+# Capacity: Measuring Transformer Memorization on Real-World Data
 
-The directories and their content:
+This repository contains the code, experiments, and visualizations for the paper:
 
-* `docs` directory -- some documentation and partial reports
-* `src` -- source codes of the research:
-    * `data_management` -- directory where we manipulated with datasets (!! `python 3.7` required):
-        * `0_snomed_starting.ipynb` -- initial launching of the db, saving to data dir
-        * `1_snomed_get_dataset` -- creating triplets dataframe and save.
-        * `2_unlinked_construction.py` -- creating sequences dataframe and save.
-    * `transformers` -- experiments with transformers models:
-        * `1_iter_trans_big.ipynb` -- first setup of experiment with triplets;
-        * `2_layers_activations*` -- second setup of experiment with triplets (layers, activation function changing) + drawing of accuracies, capacities and losses;
-        * `3_param_size*` -- third setup of experiment with triplets (amount of parameters) + drawing of accuracies, capacities and losses;
-        * `4_seqs*` -- forth setup of experiment with sequences.
+**"Capacity Matters: a Proof-of-Concept for Transformer Memorization on Real-World Data"**
+*Changalidi Anton, Aki Härmä*
+Accepted to **ACL 2025 Workshop L2M2: The First Workshop on Large Language Model Memorization**, Vienna, August 1st, 2025.
+
+The link to the paper: <tbd>
+
+---
+
+## Overview
+
+This project evaluates how decoder-only transformer architectures memorize real-world structured data. We use subsets of the **SNOMED CT** medical knowledge graph to construct two types of datasets:
+
+* **Triplets**: (Concept, Property, Related Concept)
+* **Sequences**: Simulated graph walks encoding multi-hop relationships
+
+The experiments assess the influence of:
+
+* Dataset size
+* Number of layers
+* Activation functions
+* Embedding size (total number of parameters)
+
+Using **Maximum Attainable Capacity (MAC)** as a key metric, the study identifies optimal architecture–data trade-offs for memory-limited scenarios (e.g., edge devices).
+
+---
+
+## Repository Structure
+
+```bash
+.
+├── img/                  # Figures and plots used in the paper
+├── src/                 # Source code and experiments
+│   ├── data_management/     # Dataset extraction and preprocessing (requires Python 3.7)
+│   │   ├── 0_snomed_starting.ipynb     # Initialize and load SNOMED ontology
+│   │   ├── 1_snomed_get_dataset.ipynb  # Extract triplet datasets
+│   │   └── 2_unlinked_construction.py  # Generate graph-walk sequences
+│   └── transformers/         # Experiments and architecture evaluation
+│       ├── 1_iter_trans_big.ipynb               # Initial experiments (triplets)
+│       ├── 2_layers_activations*.ipynb/.py      # Layer & activation comparisons
+│       ├── 3_param_size*.ipynb/.py              # Parameter size impact
+│       └── 4_seqs*.ipynb/.py                    # Experiments on sequence-based datasets
+├── LICENSE
+├── README.md
+└── requirements.txt
+```
+
+---
+
+## 📊 Figures
+
+All plots summarizing experimental results are located in `img/`. The filenames follow the format:
+
+* `1_datasize_*` — Results of Experiment 1 (dataset size)
+* `2_layact_*` — Experiment 2 (layer + activation variations)
+* `3_paramsize_*` — Experiment 3 (embedding/parameter size)
+* `4_seqs_*` — Experiment 4 (sequences)
+
+Each comes in both `.pdf` and `.png` formats.
+
+---
+
+## 📚 Setup Instructions
+
+**Dependencies:**
+
+```bash
+pip install -r requirements.txt
+```
+
+> ⚠️ For the `data_management` part, **Python 3.7** is required due to dependency on `owlready2`.
+
+You will need access to the SNOMED CT ontology file to run the data processing notebooks.
+
+---
+
+## 🧪 Reproducing Experiments
+
+Each experiment is defined as follows:
+
+1. **Triplets – Dataset Size Impact**
+   File: `1_iter_trans_big.ipynb`
+   Tests different dataset sizes with a fixed 1-layer transformer.
+
+2. **Triplets – Layer & Activation Influence**
+   Files: `2_layers_activations_*`
+   Tests ReLU, GELU, RReLU, Softmax with 1/2/4 layers.
+
+3. **Triplets – Parameter Size**
+   Files: `3_param_size_*`
+   Tests different embedding sizes for fixed parameter budgets.
+
+4. **Sequences – Graph Path Memorization**
+   Files: `4_seqs_*`
+   Tests ability to memorize sequences with 4–6 nodes.
+
+---
+
+## 🧠 Key Findings
+
+* **Embedding size** is the dominant factor in capacity and speed.
+* **Softmax** activation outperforms others in stability and accuracy.
+* More layers do **not** improve performance on simple datasets.
+* Sequences encode more structure and yield better memorization rates.
+* MAC is an efficient alternative to full-scale MLS computation.
+
+---
+
+## 📢 Citation
+
+If you use this code or build upon this work, please cite:
+
+(currently, this repository)
+
+```
+TBD
+```
+
+---
+
+Let me know if you'd like a shortened or LaTeX version too.
+
