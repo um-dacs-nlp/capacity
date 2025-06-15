@@ -50,7 +50,7 @@ Using **Maximum Attainable Capacity (MAC)** as a key metric, the study identifie
 
 ---
 
-## 📊 Figures
+## Figures
 
 All plots summarizing experimental results are located in `img/`. The filenames follow the format:
 
@@ -63,7 +63,7 @@ Each comes in both `.pdf` and `.png` formats.
 
 ---
 
-## 📚 Setup Instructions
+## Setup Instructions
 
 **Dependencies:**
 
@@ -71,13 +71,13 @@ Each comes in both `.pdf` and `.png` formats.
 pip install -r requirements.txt
 ```
 
-> ⚠️ For the `data_management` part, **Python 3.7** is required due to dependency on `owlready2`.
+> For the `data_management` part, **Python 3.7** is required due to dependency on `owlready2`.
 
 You will need access to the SNOMED CT ontology file to run the data processing notebooks.
 
 ---
 
-## 🧪 Reproducing Experiments
+## Reproducing Experiments
 
 Each experiment is defined as follows:
 
@@ -96,16 +96,6 @@ Each experiment is defined as follows:
 4. **Sequences – Graph Path Memorization**
    Files: `4_seqs_*`
    Tests ability to memorize sequences with 4–6 nodes.
-
----
-
-## 🧠 Key Findings
-
-* **Embedding size** is the dominant factor in capacity and speed.
-* **Softmax** activation outperforms others in stability and accuracy.
-* More layers do **not** improve performance on simple datasets.
-* Sequences encode more structure and yield better memorization rates.
-* MAC is an efficient alternative to full-scale MLS computation.
 
 ---
 
