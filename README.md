@@ -3,7 +3,7 @@
 This repository contains the code, experiments, and visualizations for the paper:
 
 **"Capacity Matters: a Proof-of-Concept for Transformer Memorization on Real-World Data"**
-*Changalidi Anton, Aki Härmä*
+*Changalidis Anton, Aki Härmä*
 Accepted to **ACL 2025 Workshop L2M2: The First Workshop on Large Language Model Memorization**, Vienna, August 1st, 2025.
 
 The link to the paper: TBD
