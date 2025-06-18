@@ -6,8 +6,6 @@ Changalidis, A.; Härmä, A. Capacity Matters: a Proof-of-Concept for Transforme
 
 Accepted to **ACL 2025 Workshop L2M2: The First Workshop on Large Language Model Memorization**, Vienna, August 1st, 2025.
 
-The link to the paper: TBD
-
 ---
 
 ## Overview
