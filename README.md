@@ -97,7 +97,7 @@ Each experiment is defined as follows:
 
 ---
 
-## 📢 Citation
+## Citation
 
 If you use this code or build upon this work, please cite:
 
@@ -114,7 +114,5 @@ If you use this code or build upon this work, please cite:
 }
 ```
 
----
 
-Let me know if you'd like a shortened or LaTeX version too.
 
